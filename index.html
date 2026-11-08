@@ -29,19 +29,21 @@
 
         <section id="plan">
             <h2>Plan a Trip</h2>
-            <form id="planForm" novalidate>
+            <form id="planForm">
                 <fieldset>
                     <legend>Trip details</legend>
 
                     <label for="origin">From</label>
-                    <select id="origin" name="origin" required>
-                        <!-- options added by JavaScript -->
+                    <select id="origin" name="origin" placeholder = "select" required>
                     </select>
 
                     <label for="destination">To</label>
                     <select id="destination" name="destination" required>
                         <!-- options added by JavaScript -->
                     </select>
+
+                    <label for="date">Date</label>
+                    <input type="date" id = "date" name ="date">
 
                     <label for="departureTime">Leave after</label>
                     <input type="time" id="departureTime" name="departureTime">
@@ -67,6 +69,14 @@
 
         <section id="results">
             <h2>Results</h2>
+
+            <label for="sortBy">Sort by</label>
+            <select id="sortBy" name="sortBy">
+                <option value="departure">Earliest departure</option>
+                <option value="fare">Lowest fare</option>
+                <option value="duration">Shortest trip</option>
+            </select>
+            
             <p id="resultsSummary" aria-live="polite">Choose a trip above to see buses.</p>
             <div id="resultsList">
                 <!-- bus cards added by JavaScript -->
@@ -85,6 +95,7 @@
                         <tr>
                             <th scope="col">From</th>
                             <th scope="col">To</th>
+                            <th scope ="col">Date</th>
                             <th scope="col">Departs</th>
                             <th scope="col">Arrives</th>
                             <th scope="col">Fare (Rs)</th>
