@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Faisal Movers Bus Planner</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+    <header>
+        <h1>Faisal Movers Bus Planner</h1>
+        <p>Find the right Faisal Movers bus for your trip.</p>
+        <nav aria-label="Main navigation">
+            <a href="#plan">Plan a Trip</a>
+            <a href="#results">Results</a>
+            <a href="#timetable">All Timetables</a>
+            <a href="#about">About</a>
+        </nav>
+    </header>
+
+    <main>
+
+        <section id="intro">
+            <h2>Welcome</h2>
+            <p>See which Faisal Movers buses run between your cities, with departure times, arrival times and fares.
+               <a href="#plan">Plan your trip now.</a></p>
+        </section>
+
+        <section id="plan">
+            <h2>Plan a Trip</h2>
+            <form id="planForm" novalidate>
+                <fieldset>
+                    <legend>Trip details</legend>
+
+                    <label for="origin">From</label>
+                    <select id="origin" name="origin" required>
+                        <!-- options added by JavaScript -->
+                    </select>
+
+                    <label for="destination">To</label>
+                    <select id="destination" name="destination" required>
+                        <!-- options added by JavaScript -->
+                    </select>
+
+                    <label for="departureTime">Leave after</label>
+                    <input type="time" id="departureTime" name="departureTime">
+
+                    <label for="fare">Maximum fare (Rs)</label>
+                    <input type="number" id="fare" name="fare" min="0" placeholder="e.g. 3000">
+
+                    <label for="busType">Bus type</label>
+                    <select id="busType" name="busType">
+                        <option value="">Any</option>
+                        <option value="Standard">Standard</option>
+                        <option value="Executive">Executive</option>
+                        <option value="Executive Plus">Executive Plus</option>
+                    </select>
+                </fieldset>
+
+                <div id="formMessage" role="alert"></div>
+
+                <button type="submit">Search</button>
+                <button type="reset" id="resetBtn">Reset</button>
+            </form>
+        </section>
+
+        <section id="results">
+            <h2>Results</h2>
+            <p id="resultsSummary" aria-live="polite">Choose a trip above to see buses.</p>
+            <div id="resultsList">
+                <!-- bus cards added by JavaScript -->
+            </div>
+        </section>
+
+        <section id="timetable">
+            <h2>All Timetables</h2>
+            <label for="tableFilter">Filter by city</label>
+            <input type="search" id="tableFilter" placeholder="e.g. Lahore">
+
+            <div class="table-wrap">
+                <table>
+                    <caption>All sample Faisal Movers trips</caption>
+                    <thead>
+                        <tr>
+                            <th scope="col">From</th>
+                            <th scope="col">To</th>
+                            <th scope="col">Departs</th>
+                            <th scope="col">Arrives</th>
+                            <th scope="col">Fare (Rs)</th>
+                            <th scope="col">Type</th>
+                        </tr>
+                    </thead>
+                    <tbody id="timetableBody">
+                        <!-- rows added by JavaScript -->
+                    </tbody>
+                </table>
+            </div>
+        </section>
+
+        <section id="about">
+            <h2>About</h2>
+            <p>This planner is for students and travellers who need a quick way to check bus times and fares.
+               It runs entirely in your browser. The timetable repeats daily and the data is sample data based on public timetables.</p>
+        </section>
+
+    </main>
+
+    <footer>
+        <p><strong>Disclaimer:</strong> This is an independent student project for educational purposes. It is not affiliated with, endorsed by, or connected to Faisal Movers in any way. "Faisal Movers" is used only to name the sample timetable data.</p>
+        <p>All times and fares are sample data and may not be accurate. Check the official Faisal Movers website or terminal for live schedules and bookings.</p>
+        <p>Created by Armaghan Mahmood Shams</p>
+    </footer>
+
+    <script src="script.js"></script>
+</body>
+</html>

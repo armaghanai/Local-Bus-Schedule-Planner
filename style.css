@@ -1,0 +1,12 @@
+.card
+{
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+}
+.card div
+{
+    border: 1px solid black;
+    width: 150px;
+    flex-grow: 1;
+}
