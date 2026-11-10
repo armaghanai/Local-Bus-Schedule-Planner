@@ -9,16 +9,16 @@ function getDynamicDate(dayOffset) {
 
 // Dynamic Dataset generated programmatically
 let data = [
-  { "id": "FM-01", "date": getDynamicDate(0), "origin": "Rawalpindi", "destination": "Peshawar", "departure": "05:00", "durationMin": 120, "arrival": "07:00", "nextDay": false, "fare": 900,  "type": "Standard" },
+  { "id": "FM-01", "date": getDynamicDate(6), "origin": "Rawalpindi", "destination": "Peshawar", "departure": "05:00", "durationMin": 120, "arrival": "07:00", "nextDay": false, "fare": 900,  "type": "Standard" },
   { "id": "FM-02", "date": getDynamicDate(0), "origin": "Rawalpindi", "destination": "Peshawar", "departure": "09:30", "durationMin": 120, "arrival": "11:30", "nextDay": false, "fare": 1200, "type": "Executive" },
   { "id": "FM-03", "date": getDynamicDate(0), "origin": "Rawalpindi", "destination": "Peshawar", "departure": "14:00", "durationMin": 115, "arrival": "15:55", "nextDay": false, "fare": 1500, "type": "Executive Plus" },
-  { "id": "FM-04", "date": getDynamicDate(0), "origin": "Rawalpindi", "destination": "Peshawar", "departure": "18:30", "durationMin": 120, "arrival": "20:30", "nextDay": false, "fare": 950,  "type": "Standard" },
+  { "id": "FM-04", "date": getDynamicDate(5), "origin": "Rawalpindi", "destination": "Peshawar", "departure": "18:30", "durationMin": 120, "arrival": "20:30", "nextDay": false, "fare": 950,  "type": "Standard" },
   { "id": "FM-05", "date": getDynamicDate(1), "origin": "Lahore", "destination": "Karachi", "departure": "08:00", "durationMin": 960, "arrival": "00:00", "nextDay": true,  "fare": 5800, "type": "Standard" },
   { "id": "FM-06", "date": getDynamicDate(1), "origin": "Lahore", "destination": "Karachi", "departure": "12:00", "durationMin": 900, "arrival": "03:00", "nextDay": true,  "fare": 6450, "type": "Executive" },
   { "id": "FM-07", "date": getDynamicDate(1), "origin": "Lahore", "destination": "Karachi", "departure": "16:30", "durationMin": 870, "arrival": "07:00", "nextDay": true,  "fare": 7200, "type": "Executive Plus" },
   { "id": "FM-08", "date": getDynamicDate(1), "origin": "Lahore", "destination": "Karachi", "departure": "21:00", "durationMin": 900, "arrival": "12:00", "nextDay": true,  "fare": 6200, "type": "Executive" },
   { "id": "FM-09", "date": getDynamicDate(0), "origin": "Rawalpindi", "destination": "Lahore", "departure": "07:00", "durationMin": 270, "arrival": "11:30", "nextDay": false, "fare": 1750, "type": "Standard" },
-  { "id": "FM-10", "date": getDynamicDate(0), "origin": "Rawalpindi", "destination": "Lahore", "departure": "11:00", "durationMin": 260, "arrival": "15:20", "nextDay": false, "fare": 2100, "type": "Executive" },
+  { "id": "FM-10", "date": getDynamicDate(7), "origin": "Rawalpindi", "destination": "Lahore", "departure": "11:00", "durationMin": 260, "arrival": "15:20", "nextDay": false, "fare": 2100, "type": "Executive" },
   { "id": "FM-11", "date": getDynamicDate(0), "origin": "Rawalpindi", "destination": "Lahore", "departure": "15:30", "durationMin": 250, "arrival": "19:40", "nextDay": false, "fare": 2600, "type": "Executive Plus" },
   { "id": "FM-12", "date": getDynamicDate(0), "origin": "Rawalpindi", "destination": "Lahore", "departure": "19:00", "durationMin": 270, "arrival": "23:30", "nextDay": false, "fare": 1800, "type": "Standard" },
   { "id": "FM-13", "date": getDynamicDate(0), "origin": "Rawalpindi", "destination": "Lahore", "departure": "23:00", "durationMin": 270, "arrival": "03:30", "nextDay": true,  "fare": 2000, "type": "Executive" },
@@ -120,6 +120,12 @@ function sortResults(list) {
 }
 
 function renderResults(origin, destination) {
+  // Hide the route map image when results appear
+  const mapContainer = document.getElementById("mapContainer");
+  if (mapContainer) {
+    mapContainer.style.display = "none";
+  }
+
   const summary = document.getElementById("resultsSummary");
   const list = document.getElementById("resultsList");
   list.innerHTML = "";
@@ -136,9 +142,14 @@ function renderResults(origin, destination) {
   sortResults(currentResults).forEach(function (route) {
     const card = document.createElement("article");
     card.className = "card";
+    let src_image = "location.png";
+
+    if(route.type === "Executive Plus")
+      src_image = "location_prem.png";
+    
     card.innerHTML = `
     <h3 class="card-route">
-    <img src="img/location.png" alt="Pin" class="card-icon" />
+    <img src="img/${src_image}" alt="Pin" class="card-icon" />
     ${route.origin} &rarr; ${route.destination}
     </h3>
     <p class="card-time">${route.departure} &rarr; ${route.arrival}${route.nextDay ? " (next day)" : ""}</p>
@@ -162,6 +173,12 @@ function resetPage() {
   document.getElementById("resultsList").innerHTML = "";
   document.getElementById("tableFilter").value = "";
   document.getElementById("sortBy").value = "departure";
+
+  // Re-display the route map image when page is reset
+  const mapContainer = document.getElementById("mapContainer");
+  if (mapContainer) {
+    mapContainer.style.display = "block";
+  }
 
   renderTimetableTable(data);
 }
@@ -213,6 +230,14 @@ function init() {
     runSearch();
   });
   form.addEventListener("reset", resetPage);
+
+  // Additional listener on reset button to guarantee resetPage executes smoothly
+  const resetBtn = document.getElementById("resetBtn");
+  if (resetBtn) {
+    resetBtn.addEventListener("click", function () {
+      setTimeout(resetPage, 10);
+    });
+  }
 
   // Live interactions: only react after a first successful search
   document.getElementById("sortBy").addEventListener("change", function () {

@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Faisal Movers Bus Planner</title>
     <link rel="stylesheet" href="style.css">
-    <link rel = "icon" href = "img/favicon.png">
+    <link rel="icon" href="img/bus.png">
 </head>
 <body>
 
@@ -27,8 +27,12 @@
             <p>See which Faisal Movers buses run between your cities, with departure times, arrival times and fares.
                <a href="#plan">Plan your trip now.</a>
             </p>
-            <div class = "moving-bus">
-                <img src = "img/bus.png" alt = "bus image" width = "350" height = "200">
+            <div class="moving-bus">
+                <div class = "convoy">
+                    <img src="img/bus.png" alt="Bus 1" class="bus1">
+                    <img src="img/bus.png" alt="Bus 2" class="bus2">
+                    <img src="img/bus.png" alt="Bus 3" class="bus3">
+                </div>
             </div>
         </section>
 
@@ -83,6 +87,13 @@
             </select>
             
             <p id="resultsSummary" aria-live="polite">Choose a trip above to see buses.</p>
+            
+            <!-- Route network map: displays initially, disappears when results appear, reappears on reset -->
+            <div id="mapContainer" class="map-container">
+                <img src="img/map.jpeg" alt="Bus Route Network Map" id="resultsMap" class="results-map">
+                <p class="map-caption">Route network overview. Select your cities and click <strong>Search</strong> to view schedules.</p>
+            </div>
+
             <div id="resultsList">
                 <!-- bus cards added by JavaScript -->
             </div>
@@ -117,7 +128,7 @@
         <section id="about">
             <h2>About</h2>
             <p>This planner is for students and travellers who need a quick way to check bus times and fares.
-               It runs entirely in your browser. The timetable repeats daily and the data is sample data based on public timetables.</p>
+               The timetable updates daily and the data is sample data based on public timetables.</p>
         </section>
 
     </main>
