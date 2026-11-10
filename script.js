@@ -137,15 +137,19 @@ function renderResults(origin, destination) {
     const card = document.createElement("article");
     card.className = "card";
     card.innerHTML = `
-      <h3 class="card-route">${route.origin} &rarr; ${route.destination}</h3>
-      <p class="card-time">${route.departure} &rarr; ${route.arrival}${route.nextDay ? " (next day)" : ""}</p>
-      <ul class="card-details">
-        <li>Date: ${route.date}</li>
-        <li>Duration: ${formatDuration(route.durationMin)}</li>
-        <li>Fare: Rs. ${route.fare}</li>
-        <li><span class="badge">${route.type}</span></li>
-      </ul>`;
-    list.appendChild(card);
+    <h3 class="card-route">
+    <img src="img/location.png" alt="Pin" class="card-icon" />
+    ${route.origin} &rarr; ${route.destination}
+    </h3>
+    <p class="card-time">${route.departure} &rarr; ${route.arrival}${route.nextDay ? " (next day)" : ""}</p>
+    <ul class="card-details">
+      <li>Date: ${route.date}</li>
+      <li>Duration: ${formatDuration(route.durationMin)}</li>
+      <li>Fare: Rs. ${route.fare}</li>
+      <li><span class="badge">${route.type}</span></li>
+    </ul>`;
+
+  list.appendChild(card);
   });
 }
 
