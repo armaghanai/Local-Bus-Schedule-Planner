@@ -1,10 +1,13 @@
-# Local Bus Schedule Planner
+# Local Bus Schedule Planner (25)
 
 A client-side inter-city bus schedule planner with trip search, sorting, a live timetable and saved bookings.
 
 **Course:** Web Engineering (5th Semester)
+
 **Project Number** 25
+
 **Author:** Armaghan Mahmood Shams
+
 **Tech:** HTML5, CSS3, Vanilla JavaScript (ES6+),
 
 > Independent student project for educational purposes. It is not affiliated with Faisal Movers. All routes, times and fares are sample data.
