@@ -1,8 +1,9 @@
-# Faisal Movers Bus Planner
+# Local Bus Schedule Planner
 
 A client-side inter-city bus schedule planner with trip search, sorting, a live timetable and saved bookings.
 
 **Course:** Web Engineering (5th Semester)
+**Project Number** 25
 **Author:** Armaghan Mahmood Shams
 **Tech:** HTML5, CSS3, Vanilla JavaScript (ES6+),
 
@@ -17,7 +18,7 @@ For the problem statement, wireframes, WDLC stages and the client/server analysi
 
 | Desktop (1000px+) | Mobile (under 600px) |
 | :---: | :---: |
-| ![Desktop home view](screenshots/desktop-home.png) | ![Mobile home view](screenshots/mobile-home.png) |
+| ![Desktop home view](screenshots/desktop-home.png) | ![Mobile home view](screenshots/mobile-home.jpeg) |
 | *Capture: header, welcome banner with moving buses, planner form and route map.* | *Capture: stacked layout with full-width buttons and the contained bus animation.* |
 
 ### Searching
