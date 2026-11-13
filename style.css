@@ -260,3 +260,105 @@ footer {
 @media (prefers-reduced-motion: reduce) {
   .convoy { animation: none; left: 20px; }
 }
+
+/* ==================================================================
+   BOOKINGS (added): everything below is new and uses new class names
+   or IDs only, so the original styles above are not affected.
+   ================================================================== */
+
+/* booking count shown in the navigation */
+.nav-count {
+  display: inline-block;
+  min-width: 20px;
+  margin-left: 4px;
+  padding: 0 6px;
+  background: #ff6b4a;
+  color: white;
+  border-radius: 10px;
+  font-size: 0.8rem;
+  line-height: 20px;
+  text-align: center;
+}
+.nav-count[hidden] { display: none; }
+
+/* "Book this bus" checkbox on each result card */
+.book-option {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 12px 0 0;
+  padding-top: 10px;
+  border-top: 1px dashed #dcd8d2;
+  cursor: pointer;
+}
+.book-check {
+  width: 18px;
+  height: 18px;
+  padding: 0;
+  margin: 0;
+  flex-shrink: 0;
+  accent-color: #ff6b4a;
+  cursor: pointer;
+}
+.book-check:focus-visible {
+  outline: 3px solid rgba(255,107,74,0.4);
+  outline-offset: 2px;
+}
+.book-check:disabled { cursor: not-allowed; }
+.book-check:disabled + .book-label { color: #5b6073; font-weight: normal; }
+
+/* messages for booking feedback (same look as the existing messages) */
+.notice:not(:empty) {
+  padding: 10px;
+  margin: 12px 0;
+  font-weight: bold;
+  border-radius: 6px;
+}
+.notice-warn:not(:empty) {
+  background: #fff8e6;
+  color: #6b4a00;
+  border-left: 5px solid #ffb703;
+  animation: shake 0.3s;
+}
+.notice-ok:not(:empty) {
+  background: #fff1ee;
+  border-left: 4px solid #ff6b4a;
+}
+
+/* My Bookings section */
+#bookingsSummary {
+  font-weight: bold;
+  background: #fff1ee;
+  border-left: 4px solid #ff6b4a;
+  padding: 10px;
+  border-radius: 6px;
+}
+.bookings-note { font-size: 0.9rem; color: #5b6073; margin: 8px 0 0; }
+#bookingsList {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 14px;
+}
+#bookingsList .empty-message { grid-column: 1 / -1; margin: 0; }
+
+.btn-delete {
+  margin: 12px 0 0;
+  padding: 6px 14px;
+  font-size: 0.9rem;
+  background: white;
+  color: #a4162a;
+  border: 2px solid #d62839;
+}
+.btn-delete:hover { background: #fdecee; }
+.btn-delete:focus-visible {
+  outline: 3px solid rgba(214,40,57,0.3);
+  outline-offset: 2px;
+}
+
+@media (min-width: 951px) {
+  #bookings { grid-column: 1 / -1; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .notice-warn:not(:empty) { animation: none; }
+}

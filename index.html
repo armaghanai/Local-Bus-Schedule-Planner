@@ -14,7 +14,7 @@
         <p>Find the right Faisal Movers bus for your trip.</p>
         <nav aria-label="Main navigation">
             <a href="#plan">Plan a Trip</a>
-            <a href="#results">Results</a>
+            <a href="#bookings">My Bookings <span id="navBookingCount" class="nav-count" hidden>0</span></a>
             <a href="#timetable">All Timetables</a>
             <a href="#about">About</a>
         </nav>
@@ -87,6 +87,9 @@
             </select>
             
             <p id="resultsSummary" aria-live="polite">Choose a trip above to see buses.</p>
+
+            <!-- Booking feedback (limit warning, confirmation) is written here by JavaScript -->
+            <div id="bookingMessage" class="notice" role="status"></div>
             
             <!-- Route network map: displays initially, disappears when results appear, reappears on reset -->
             <div id="mapContainer" class="map-container">
@@ -96,6 +99,18 @@
 
             <div id="resultsList">
                 <!-- bus cards added by JavaScript -->
+            </div>
+        </section>
+
+        <section id="bookings">
+            <h2>My Bookings</h2>
+            <p id="bookingsSummary" aria-live="polite">No bookings yet.</p>
+            <p class="bookings-note">You can save up to 5 bookings. A booking is removed automatically once its bus has departed.</p>
+
+            <div id="bookingsMessage" class="notice" role="status"></div>
+
+            <div id="bookingsList">
+                <!-- booking cards added by JavaScript -->
             </div>
         </section>
 

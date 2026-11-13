@@ -34,6 +34,240 @@ let data = [
 let hasSearched = false;   // true after the first successful search
 let currentResults = [];   // the latest matches, so sorting doesn't need a new search
 
+const BOOKING_KEY = "fmBookings";
+const MAX_BOOKINGS = 5;
+
+function bookingKey(id, date) {
+  return id + "|" + date;
+}
+
+// Turns a trip's date ("YYYY-MM-DD") and departure ("HH:MM") into a local Date
+function departureDate(item) {
+  const [y, m, d] = item.date.split("-").map(Number);
+  const [hh, mm] = item.departure.split(":").map(Number);
+  return new Date(y, m - 1, d, hh, mm);
+}
+
+function hasDeparted(item) {
+  return departureDate(item) < new Date();
+}
+
+// Guards against missing or edited data in localStorage
+function isValidBooking(b) {
+  return b && typeof b === "object" &&
+    typeof b.id === "string" &&
+    typeof b.origin === "string" &&
+    typeof b.destination === "string" &&
+    typeof b.type === "string" &&
+    typeof b.fare === "number" &&
+    typeof b.durationMin === "number" &&
+    typeof b.nextDay === "boolean" &&
+    typeof b.date === "string" && /^\d{4}-\d{2}-\d{2}$/.test(b.date) &&
+    typeof b.departure === "string" && /^\d{2}:\d{2}$/.test(b.departure) &&
+    typeof b.arrival === "string" && /^\d{2}:\d{2}$/.test(b.arrival);
+}
+
+function writeBookings(list) {
+  try {
+    localStorage.setItem(BOOKING_KEY, JSON.stringify(list));
+    return true;
+  } catch (e) {
+    return false; // storage full, blocked or unavailable
+  }
+}
+
+// Reads bookings, drops invalid, duplicate and already-departed ones
+function readBookings() {
+  let raw;
+  try {
+    raw = JSON.parse(localStorage.getItem(BOOKING_KEY));
+  } catch (e) {
+    return [];
+  }
+  if (!Array.isArray(raw)) return [];
+
+  const seen = new Set();
+  const valid = raw.filter(function (b) {
+    if (!isValidBooking(b) || hasDeparted(b)) return false;
+    const key = bookingKey(b.id, b.date);
+    if (seen.has(key)) return false;
+    seen.add(key);
+    return true;
+  }).slice(0, MAX_BOOKINGS);
+
+  if (valid.length !== raw.length) writeBookings(valid); // clean up storage
+  return valid;
+}
+
+function escapeHTML(text) {
+  return String(text)
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#39;");
+}
+
+// kind: "warn" or "ok". Pass empty text to clear the message.
+function setNotice(elementId, text, kind) {
+  const el = document.getElementById(elementId);
+  if (!el) return;
+  el.textContent = text;
+  el.className = text ? "notice notice-" + kind : "notice";
+}
+
+function setBookLabel(checkbox, booked) {
+  const label = checkbox.parentElement.querySelector(".book-label");
+  if (label) label.textContent = booked ? "Booked (untick to cancel)" : "Book this bus";
+}
+
+function handleBookingChange(checkbox) {
+  const id = checkbox.dataset.id;
+  const date = checkbox.dataset.date;
+  const route = data.find(function (r) { return r.id === id && r.date === date; });
+  if (!route) return;
+
+  const bookings = readBookings();
+  const key = bookingKey(id, date);
+  const index = bookings.findIndex(function (b) { return bookingKey(b.id, b.date) === key; });
+
+  if (checkbox.checked) {
+    if (index !== -1) return; // already booked
+
+    if (hasDeparted(route)) {
+      checkbox.checked = false;
+      setNotice("bookingMessage", "This bus has already departed and can't be booked.", "warn");
+      return;
+    }
+
+    if (bookings.length >= MAX_BOOKINGS) {
+      checkbox.checked = false;
+      setNotice("bookingMessage",
+        "Booking limit reached: you can only save " + MAX_BOOKINGS + " bookings. Delete one in My Bookings to book another bus.",
+        "warn");
+      return;
+    }
+
+    bookings.push({
+      id: route.id,
+      date: route.date,
+      origin: route.origin,
+      destination: route.destination,
+      departure: route.departure,
+      arrival: route.arrival,
+      nextDay: route.nextDay,
+      durationMin: route.durationMin,
+      fare: route.fare,
+      type: route.type
+    });
+
+    if (!writeBookings(bookings)) {
+      checkbox.checked = false;
+      setNotice("bookingMessage", "Your booking couldn't be saved. Browser storage may be full or blocked.", "warn");
+      return;
+    }
+
+    let msg = "Booked " + route.origin + " to " + route.destination + " on " + route.date + " at " + route.departure + ". See it in My Bookings.";
+    if (bookings.length === MAX_BOOKINGS) {
+      msg += " You have now reached the limit of " + MAX_BOOKINGS + " bookings.";
+    }
+    setNotice("bookingMessage", msg, "ok");
+  } else {
+    if (index === -1) return;
+    bookings.splice(index, 1);
+    if (!writeBookings(bookings)) {
+      checkbox.checked = true;
+      setNotice("bookingMessage", "Your booking couldn't be removed. Browser storage may be blocked.", "warn");
+      return;
+    }
+    setNotice("bookingMessage", "Booking removed.", "ok");
+  }
+
+  refreshBookingsUI();
+}
+
+function deleteBooking(id, date) {
+  const bookings = readBookings();
+  const key = bookingKey(id, date);
+  const index = bookings.findIndex(function (b) { return bookingKey(b.id, b.date) === key; });
+  if (index === -1) {
+    refreshBookingsUI();
+    return;
+  }
+
+  const removed = bookings.splice(index, 1)[0];
+  if (!writeBookings(bookings)) {
+    setNotice("bookingsMessage", "The booking couldn't be deleted. Browser storage may be blocked.", "warn");
+    return;
+  }
+
+  setNotice("bookingsMessage", "Deleted booking: " + removed.origin + " to " + removed.destination + " on " + removed.date + ".", "ok");
+  setNotice("bookingMessage", "", "ok");
+  refreshBookingsUI();
+}
+
+function renderBookings() {
+  const bookings = readBookings().sort(function (a, b) {
+    return departureDate(a) - departureDate(b);
+  });
+
+  const summary = document.getElementById("bookingsSummary");
+  const list = document.getElementById("bookingsList");
+  const navCount = document.getElementById("navBookingCount");
+  list.innerHTML = "";
+
+  navCount.textContent = bookings.length;
+  navCount.hidden = bookings.length === 0;
+
+  if (bookings.length === 0) {
+    summary.textContent = "No bookings yet.";
+    return;
+  }
+
+  summary.textContent = `You have ${bookings.length} of ${MAX_BOOKINGS} bookings.`;
+
+  bookings.forEach(function (b) {
+    const card = document.createElement("article");
+    card.className = "card";
+    const icon = b.type === "Executive Plus" ? "location_prem.png" : "location.png";
+    const route = escapeHTML(b.origin) + " to " + escapeHTML(b.destination);
+
+    card.innerHTML = `
+    <h3 class="card-route">
+    <img src="img/${icon}" alt="Pin" class="card-icon" />
+    ${escapeHTML(b.origin)} &rarr; ${escapeHTML(b.destination)}
+    </h3>
+    <p class="card-time">${escapeHTML(b.departure)} &rarr; ${escapeHTML(b.arrival)}${b.nextDay ? " (next day)" : ""}</p>
+    <ul class="card-details">
+      <li>Date: ${escapeHTML(b.date)}</li>
+      <li>Duration: ${formatDuration(b.durationMin)}</li>
+      <li>Fare: Rs. ${escapeHTML(b.fare)}</li>
+      <li><span class="badge">${escapeHTML(b.type)}</span></li>
+    </ul>
+    <button type="button" class="btn-delete"
+      data-id="${escapeHTML(b.id)}" data-date="${escapeHTML(b.date)}"
+      aria-label="Delete booking: ${route} on ${escapeHTML(b.date)}">Delete booking</button>`;
+
+    list.appendChild(card);
+  });
+}
+
+// Keeps the result checkboxes in step with what is saved
+function syncResultCheckboxes() {
+  const booked = new Set(readBookings().map(function (b) { return bookingKey(b.id, b.date); }));
+  document.querySelectorAll("#resultsList .book-check").forEach(function (checkbox) {
+    if (checkbox.disabled) return;
+    const isBooked = booked.has(bookingKey(checkbox.dataset.id, checkbox.dataset.date));
+    checkbox.checked = isBooked;
+    setBookLabel(checkbox, isBooked);
+  });
+}
+
+function refreshBookingsUI() {
+  renderBookings();
+  syncResultCheckboxes();
+}
+
 function formatDuration(mins) {
   const h = Math.floor(mins / 60);
   const m = mins % 60;
@@ -88,6 +322,7 @@ function runSearch() {
     return;
   }
   message.textContent = "";
+  setNotice("bookingMessage", "", "ok");
 
   const maxFare = fareInput === "" ? null : Number(fareInput);
 
@@ -132,12 +367,14 @@ function renderResults(origin, destination) {
 
   if (currentResults.length === 0) {
     summary.textContent = "No buses found.";
-    list.innerHTML = "<p class='empty-message'>No buses match your search. Try a different date, a later time, a higher fare limit or another bus type.</p>";
     return;
   }
 
   const count = currentResults.length;
   summary.textContent = `${count} ${count === 1 ? "bus" : "buses"} found from ${origin} to ${destination}.`;
+
+  // Which of these trips are already booked (checked once, not per card)
+  const bookedKeys = new Set(readBookings().map(function (b) { return bookingKey(b.id, b.date); }));
 
   sortResults(currentResults).forEach(function (route) {
     const card = document.createElement("article");
@@ -146,6 +383,10 @@ function renderResults(origin, destination) {
 
     if(route.type === "Executive Plus")
       src_image = "location_prem.png";
+
+    const isBooked = bookedKeys.has(bookingKey(route.id, route.date));
+    const departed = hasDeparted(route);
+    const bookLabel = isBooked ? "Booked (untick to cancel)" : (departed ? "Already departed" : "Book this bus");
     
     card.innerHTML = `
     <h3 class="card-route">
@@ -158,7 +399,12 @@ function renderResults(origin, destination) {
       <li>Duration: ${formatDuration(route.durationMin)}</li>
       <li>Fare: Rs. ${route.fare}</li>
       <li><span class="badge">${route.type}</span></li>
-    </ul>`;
+    </ul>
+    <label class="book-option">
+      <input type="checkbox" class="book-check" data-id="${route.id}" data-date="${route.date}"
+        ${isBooked ? "checked" : ""} ${departed && !isBooked ? "disabled" : ""}>
+      <span class="book-label">${bookLabel}</span>
+    </label>`;
 
   list.appendChild(card);
   });
@@ -169,6 +415,7 @@ function resetPage() {
   currentResults = [];
 
   document.getElementById("formMessage").textContent = "";
+  setNotice("bookingMessage", "", "ok");
   document.getElementById("resultsSummary").textContent = "Choose a trip above to see buses.";
   document.getElementById("resultsList").innerHTML = "";
   document.getElementById("tableFilter").value = "";
@@ -258,6 +505,25 @@ function init() {
              route.destination.toLowerCase().includes(query);
     });
     renderTimetableTable(filtered);
+  });
+
+  // Bookings: one listener each, using event delegation because the cards are rebuilt often
+  document.getElementById("resultsList").addEventListener("change", function (event) {
+    if (event.target.classList.contains("book-check")) {
+      handleBookingChange(event.target);
+    }
+  });
+  document.getElementById("bookingsList").addEventListener("click", function (event) {
+    const button = event.target.closest(".btn-delete");
+    if (button) deleteBooking(button.dataset.id, button.dataset.date);
+  });
+
+  // Show saved bookings on load (this also removes any that have already departed)
+  refreshBookingsUI();
+
+  // If the tab was left open for hours, clear out departed bookings when the person returns
+  document.addEventListener("visibilitychange", function () {
+    if (!document.hidden) refreshBookingsUI();
   });
 }
 
